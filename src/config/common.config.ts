@@ -1,9 +1,7 @@
 import { registerAs } from '@nestjs/config';
 
 export default registerAs('common', () => ({
-  tempObj: {
-    propA: process.env.PROP_A,
-    propB: process.env.PROP_B,
+  application: {
+    port: Number(process.env.APPLICATION_PORT),
   },
-  tempArr: [1, 2, 3],
 }));
