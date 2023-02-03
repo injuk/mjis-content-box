@@ -1,14 +1,14 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { BooksModule } from './books/books.module';
+import commonConfig from './config/common.config';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
-      envFilePath:
-        process.env.NODE_ENV === 'PROD'
-          ? '.production.env'
-          : '.development.env',
+      envFilePath: [`${__dirname}/config/env/.${process.env.NODE_ENV}.env`],
+      load: [commonConfig],
+      isGlobal: true,
     }),
     BooksModule,
   ],
