@@ -3,20 +3,62 @@ users: {
 
   id: int { constraint: primary_key }
 
+  role: varchar(20)
+  email: varchar(255) { constraint: unique }
+  nickname: varchar(255)
+
+  created_at: datetime
+  updated_at: datetime
 }
 
 books: {
   shape: sql_table
 
   id: int { constraint: primary_key }
-  isbn: varchar(50)
-  userId: int { constraint: foreign_key }
 
-  coverUrl: varchar(50)
+  title: varchar(255)
+  original_title: varchar(255)
+  author: varchar(255)
+  publisher: varchar(100)
+  published_at: datetime
+
+  isbn: varchar(20) { constraint: unique }
+  genre: varchar(20)
+  cover_url: varchar(255)
+
+  created_at: datetime
+  created_by: int
+  updated_at: datetime
+  updated_by: int
 }
 
 reviews: {
+  shape: sql_table
 
+  user_id: int { constraint: foreign_key }
+  book_id: int { constraint: foreign_key }
+
+  rating: int
+  content: text
+  has_spoiler: boolean
+
+  created_at: datetime
+  updated_at: datetime
 }
 
-books.userId -> users.id
+reviews.user_id <-> users.id {
+  source-arrowhead: N {
+    shape: cf-many
+  }
+  target-arrowhead: 1 {
+    shape: cf-one-required
+  }
+}
+reviews.book_id <-> books.id {
+  source-arrowhead: N {
+    shape: cf-many
+  }
+  target-arrowhead: 1 {
+    shape: cf-one-required
+  }
+}
