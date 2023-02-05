@@ -41,7 +41,7 @@ model Book {
 
   publishedAt DateTime? @map("published_at") @db.Date
 
-  isbn  String  @unique @map("isbn") @db.VarChar(20)
+  isbn  String  @map("isbn") @db.VarChar(20)
   genre String? @map("genre") @db.VarChar(20)
 
   coverUrl String? @map("cover_url") @db.VarChar(255)
