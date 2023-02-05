@@ -15,3 +15,62 @@ enum USER_ROLES {
   USER
   GUEST
 }
+
+model User {
+  id Int @id @default(autoincrement()) @map("id")
+
+  role     USER_ROLES @default(USER) @map("role")
+  email    String     @unique @map("email") @db.VarChar(255)
+  nickname String?    @map("nickname") @db.VarChar(255)
+
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  reviews Review[] @relation("USER_HAS_MANY_REVIEWS")
+
+  @@map("users")
+}
+
+model Book {
+  id Int @id @default(autoincrement()) @map("id")
+
+  title         String  @map("title") @db.VarChar(255)
+  originalTitle String  @map("original_title") @db.VarChar(255)
+  author        String  @map("author") @db.VarChar(255)
+  publisher     String? @map("publisher") @db.VarChar(100)
+
+  publishedAt DateTime? @map("published_at") @db.Date
+
+  isbn  String  @unique @map("isbn") @db.VarChar(20)
+  genre String? @map("genre") @db.VarChar(20)
+
+  coverUrl String? @map("cover_url") @db.VarChar(255)
+
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz()
+  createdBy Int      @map("created_by")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  updatedBy Int      @map("updated_by")
+
+  reviews Review[] @relation("BOOK_HAS_MANY_REVIEWS")
+
+  @@unique(name: "UQ_AUTHOR_ISBN", fields: [author, isbn])
+  @@map("books")
+}
+
+model Review {
+  userId Int  @map("user_id")
+  user   User @relation("USER_HAS_MANY_REVIEWS", fields: [userId], references: [id], onDelete: Cascade)
+
+  bookId Int  @map("book_id")
+  book   Book @relation("BOOK_HAS_MANY_REVIEWS", fields: [bookId], references: [id], onDelete: Cascade)
+
+  rating     Int     @map("rating")
+  content    String  @map("content") @db.Text
+  hasSpoiler Boolean @map("has_spoiler") @db.Boolean
+
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@id([userId, bookId])
+  @@map("reviews")
+}
