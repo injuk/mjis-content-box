@@ -1,7 +1,15 @@
-import { Controller, Get, Inject, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Inject,
+  Post,
+  ValidationPipe,
+} from '@nestjs/common';
 import { ConfigType } from '@nestjs/config';
 import commonConfig from 'src/config/common.config';
 import { BooksService } from './books.service';
+import { CreateBookDto } from './dto/create-book.dto';
 
 @Controller('books')
 export class BooksController {
@@ -10,13 +18,8 @@ export class BooksController {
     private readonly service: BooksService,
   ) {}
 
-  @Get()
-  temp() {
-    return this.config;
-  }
-
   @Post()
-  createBook() {
-    return this.service.createBook();
+  createBook(@Body(ValidationPipe) dto: CreateBookDto) {
+    return this.service.createBook(dto);
   }
 }
