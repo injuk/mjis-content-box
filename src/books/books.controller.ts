@@ -4,6 +4,7 @@ import {
   Get,
   Inject,
   Post,
+  UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
 import { ConfigType } from '@nestjs/config';
@@ -19,7 +20,8 @@ export class BooksController {
   ) {}
 
   @Post()
-  createBook(@Body(ValidationPipe) dto: CreateBookDto) {
+  @UsePipes(new ValidationPipe({ transform: true }))
+  createBook(@Body() dto: CreateBookDto) {
     return this.service.createBook(dto);
   }
 }
