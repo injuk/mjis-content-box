@@ -22,6 +22,7 @@ model User {
   role     USER_ROLES @default(USER) @map("role")
   email    String     @unique @map("email") @db.VarChar(255)
   nickname String?    @map("nickname") @db.VarChar(255)
+  password String     @map("password") @db.VarChar(255)
 
   createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz()
   updatedAt DateTime @updatedAt @map("updated_at")
