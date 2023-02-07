@@ -9,6 +9,7 @@ export class BooksService {
   constructor(private readonly prisma: PrismaService) {}
 
   createBook(dto: CreateBookDto) {
+    this.logger.debug(`create new book`);
     const { author, isbn } = dto;
 
     return this.prisma.$transaction(async (transactionCtx) => {
@@ -36,6 +37,25 @@ export class BooksService {
           updatedBy: 1,
         },
       });
+    });
+  }
+
+  listBooks() {
+    this.logger.debug(`list books`);
+
+    return this.prisma.$transaction(async (transactionCtx) => {
+      const { _count } = await transactionCtx.book.aggregate({
+        _count: true,
+      });
+
+      if (_count === 0) return { totalCount: 0, results: [] };
+
+      // TODO: nextToken 방식 도입하기
+      const books = await transactionCtx.book.findMany({
+        take: 50,
+      });
+
+      return { totalCount: _count, results: books };
     });
   }
 }

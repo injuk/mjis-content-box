@@ -16,12 +16,18 @@ import { CreateBookDto } from './dto/create-book.dto';
 export class BooksController {
   constructor(
     @Inject(commonConfig.KEY) private config: ConfigType<typeof commonConfig>,
-    private readonly service: BooksService,
+    private readonly booksService: BooksService,
   ) {}
 
   @Post()
   @UsePipes(new ValidationPipe({ transform: true }))
   createBook(@Body() dto: CreateBookDto) {
-    return this.service.createBook(dto);
+    return this.booksService.createBook(dto);
+  }
+
+  @Get()
+  // TODO: nextToken 방식 도입하기
+  listBooks() {
+    return this.booksService.listBooks();
   }
 }
