@@ -24,7 +24,6 @@ export class BooksService {
           UQ_AUTHOR_ISBN: { author, isbn },
         },
       });
-
       if (book) throw new ConflictException(`author(${author}), isbn(${isbn})`);
 
       return transactionCtx.book.create({
@@ -70,11 +69,8 @@ export class BooksService {
     this.logger.debug(`get book by id`);
 
     const result = await this.prisma.book.findUnique({
-      where: {
-        id,
-      },
+      where: { id },
     });
-
     if (!result) throw new NotFoundException(`book_id(${id})`);
 
     return result;
@@ -83,16 +79,26 @@ export class BooksService {
   updateBook(id: number, dto: UpdateBookDto) {
     return this.prisma.$transaction(async (transactionCtx) => {
       const book = await transactionCtx.book.findUnique({
-        where: {
-          id,
-        },
+        where: { id },
       });
-
       if (!book) throw new NotFoundException(`book_id(${id})`);
 
       return transactionCtx.book.update({
         where: { id },
         data: { ...dto },
+      });
+    });
+  }
+
+  deleteBookById(id: number) {
+    return this.prisma.$transaction(async (transactionCtx) => {
+      const book = await transactionCtx.book.findUnique({
+        where: { id },
+      });
+      if (!book) throw new NotFoundException(`book_id(${id})`);
+
+      return transactionCtx.book.delete({
+        where: { id },
       });
     });
   }

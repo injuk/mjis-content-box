@@ -2,7 +2,9 @@ import {
   BadRequestException,
   Body,
   Controller,
+  Delete,
   Get,
+  HttpCode,
   Inject,
   Param,
   ParseIntPipe,
@@ -51,5 +53,11 @@ export class BooksController {
     if (!Object.keys(dto).length) throw new BadRequestException(`empty data`);
 
     return this.booksService.updateBook(id, dto);
+  }
+
+  @Delete('/:id')
+  @HttpCode(204)
+  async deleteBookById(@Param('id', ParseIntPipe) id: number) {
+    return this.booksService.deleteBookById(id);
   }
 }
