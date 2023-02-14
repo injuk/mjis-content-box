@@ -1,4 +1,9 @@
-import { Logger, Injectable, ConflictException } from '@nestjs/common';
+import {
+  Logger,
+  Injectable,
+  ConflictException,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateBookDto } from './dto/create-book.dto';
 
@@ -57,5 +62,19 @@ export class BooksService {
 
       return { totalCount: _count, results: books };
     });
+  }
+
+  async getBookById(id: number) {
+    this.logger.debug(`get book by id`);
+
+    const result = await this.prisma.book.findUnique({
+      where: {
+        id,
+      },
+    });
+
+    if (!result) throw new NotFoundException(`book_id(${id})`);
+
+    return result;
   }
 }

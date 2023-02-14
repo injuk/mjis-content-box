@@ -3,6 +3,9 @@ import {
   Controller,
   Get,
   Inject,
+  Param,
+  ParseIntPipe,
+  Patch,
   Post,
   UsePipes,
   ValidationPipe,
@@ -29,5 +32,10 @@ export class BooksController {
   // TODO: nextToken 방식 도입하기
   listBooks() {
     return this.booksService.listBooks();
+  }
+
+  @Get('/:id')
+  getBookById(@Param('id', ParseIntPipe) id: number) {
+    return this.booksService.getBookById(id);
   }
 }
