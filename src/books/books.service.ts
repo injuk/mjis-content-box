@@ -1,105 +1,60 @@
-import {
-  Logger,
-  Injectable,
-  ConflictException,
-  NotFoundException,
-} from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
+import { Logger, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateBookDto } from './dto/create-book.dto';
 import { UpdateBookDto } from './dto/update-book.dto';
+import { BooksRepository } from './books.repository';
 
 @Injectable()
 export class BooksService {
   private readonly logger = new Logger(BooksService.name);
 
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly repository: BooksRepository) {}
 
   createBook(dto: CreateBookDto) {
     this.logger.debug(`create new book`);
-    const { author, isbn } = dto;
 
-    return this.prisma.$transaction(async (transactionCtx) => {
-      const book = await transactionCtx.book.findUnique({
-        where: {
-          UQ_AUTHOR_ISBN: { author, isbn },
-        },
-      });
-      if (book) throw new ConflictException(`author(${author}), isbn(${isbn})`);
+    const data = {
+      title: dto.title,
+      originalTitle: dto.originalTitle,
+      author: dto.author,
+      publisher: dto.publisher,
+      publishedAt: dto.publishedAt,
+      isbn: dto.isbn,
+      genre: dto.genre,
+      coverUrl: dto.coverUrl,
 
-      return transactionCtx.book.create({
-        data: {
-          title: dto.title,
-          originalTitle: dto.originalTitle,
-          author: dto.author,
-          publisher: dto.publisher,
-          publishedAt: dto.publishedAt,
-          isbn: dto.isbn,
-          genre: dto.genre,
-          coverUrl: dto.coverUrl,
+      // TODO: users API가 도입되면 수정할 것
+      createdBy: 1,
+      updatedBy: 1,
+    };
 
-          // TODO: users API가 도입되면 수정할 것
-          createdBy: 1,
-          updatedBy: 1,
-        },
-      });
-    });
+    return this.repository.createBook(data);
   }
 
   listBooks() {
     this.logger.debug(`list books`);
 
-    return this.prisma.$transaction(async (transactionCtx) => {
-      const { _count } = await transactionCtx.book.aggregate({
-        _count: true,
-      });
-
-      if (_count === 0) return { totalCount: 0, results: [] };
-
-      // TODO: nextToken 방식 도입하기
-      const books = await transactionCtx.book.findMany({
-        take: 50,
-      });
-
-      return { totalCount: _count, results: books };
-    });
+    return this.repository.listBooks();
   }
 
   // TODO: 반환 형태 정의하기
   async getBookById(id: number) {
     this.logger.debug(`get book by id`);
 
-    const result = await this.prisma.book.findUnique({
-      where: { id },
-    });
+    const result = await this.repository.getBookById(id);
     if (!result) throw new NotFoundException(`book_id(${id})`);
 
     return result;
   }
 
   updateBook(id: number, dto: UpdateBookDto) {
-    return this.prisma.$transaction(async (transactionCtx) => {
-      const book = await transactionCtx.book.findUnique({
-        where: { id },
-      });
-      if (!book) throw new NotFoundException(`book_id(${id})`);
+    this.logger.debug(`update book`);
 
-      return transactionCtx.book.update({
-        where: { id },
-        data: { ...dto },
-      });
-    });
+    return this.repository.updateBook(id, dto);
   }
 
   deleteBookById(id: number) {
-    return this.prisma.$transaction(async (transactionCtx) => {
-      const book = await transactionCtx.book.findUnique({
-        where: { id },
-      });
-      if (!book) throw new NotFoundException(`book_id(${id})`);
+    this.logger.debug(`delete book`);
 
-      return transactionCtx.book.delete({
-        where: { id },
-      });
-    });
+    return this.repository.deleteBookById(id);
   }
 }
