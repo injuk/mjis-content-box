@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Get,
@@ -14,6 +15,7 @@ import { ConfigType } from '@nestjs/config';
 import commonConfig from 'src/config/common.config';
 import { BooksService } from './books.service';
 import { CreateBookDto } from './dto/create-book.dto';
+import { UpdateBookDto } from './dto/update-book.dto';
 
 @Controller('books')
 export class BooksController {
@@ -37,5 +39,17 @@ export class BooksController {
   @Get('/:id')
   getBookById(@Param('id', ParseIntPipe) id: number) {
     return this.booksService.getBookById(id);
+  }
+
+  @Patch('/:id')
+  @UsePipes(new ValidationPipe({ transform: true }))
+  updateBook(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: UpdateBookDto,
+  ) {
+    // TODO: 더 우아한 방법은 없을까...?
+    if (!Object.keys(dto).length) throw new BadRequestException(`empty data`);
+
+    return this.booksService.updateBook(id, dto);
   }
 }

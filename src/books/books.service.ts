@@ -6,6 +6,7 @@ import {
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateBookDto } from './dto/create-book.dto';
+import { UpdateBookDto } from './dto/update-book.dto';
 
 @Injectable()
 export class BooksService {
@@ -64,6 +65,7 @@ export class BooksService {
     });
   }
 
+  // TODO: 반환 형태 정의하기
   async getBookById(id: number) {
     this.logger.debug(`get book by id`);
 
@@ -76,5 +78,22 @@ export class BooksService {
     if (!result) throw new NotFoundException(`book_id(${id})`);
 
     return result;
+  }
+
+  updateBook(id: number, dto: UpdateBookDto) {
+    return this.prisma.$transaction(async (transactionCtx) => {
+      const book = await transactionCtx.book.findUnique({
+        where: {
+          id,
+        },
+      });
+
+      if (!book) throw new NotFoundException(`book_id(${id})`);
+
+      return transactionCtx.book.update({
+        where: { id },
+        data: { ...dto },
+      });
+    });
   }
 }

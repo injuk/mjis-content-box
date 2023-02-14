@@ -1,23 +1,20 @@
-import {
-  IsDateString,
-  IsOptional,
-  IsString,
-  IsUrl,
-  Length,
-} from 'class-validator';
+import { IsDateString, IsOptional, IsString, IsUrl } from 'class-validator';
 import { Transform } from 'class-transformer';
 import Utility from '../../common/util';
 
-export class CreateBookDto {
+export class UpdateBookDto {
   @IsString()
+  @IsOptional()
   @Transform(Utility.trimWhenStringValue)
   readonly title: string;
 
   @IsString()
+  @IsOptional()
   @Transform(Utility.trimWhenStringValue)
   readonly originalTitle: string;
 
   @IsString()
+  @IsOptional()
   @Transform(Utility.trimWhenStringValue)
   readonly author: string;
 
@@ -29,11 +26,6 @@ export class CreateBookDto {
   @IsDateString()
   @IsOptional()
   readonly publishedAt: string;
-
-  @IsString()
-  @Length(13, 13)
-  @Transform(Utility.trimWhenStringValue)
-  readonly isbn: string;
 
   @IsString()
   @IsOptional()
