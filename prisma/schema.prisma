@@ -8,6 +8,8 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+
+  relationMode = "prisma"
 }
 
 enum USER_ROLES {
@@ -58,12 +60,24 @@ model Book {
   @@map("books")
 }
 
+model Movie {
+  id Int @id @default(autoincrement()) @map("id")
+
+  title String @map("title") @db.VarChar(255)
+
+  reviews Review[] @relation("MOVIE_HAS_MANY_REVIEWS")
+
+  @@map("movies")
+}
+
 model Review {
   userId Int  @map("user_id")
   user   User @relation("USER_HAS_MANY_REVIEWS", fields: [userId], references: [id], onDelete: Cascade)
 
-  bookId Int  @map("book_id")
-  book   Book @relation("BOOK_HAS_MANY_REVIEWS", fields: [bookId], references: [id], onDelete: Cascade)
+  itemId Int @map("item_id")
+
+  book  Book?  @relation("BOOK_HAS_MANY_REVIEWS", fields: [itemId], references: [id], onDelete: Cascade, map: "review_book")
+  movie Movie? @relation("MOVIE_HAS_MANY_REVIEWS", fields: [itemId], references: [id], onDelete: Cascade, map: "review_movie")
 
   rating     Int     @map("rating")
   content    String  @map("content") @db.Text
@@ -72,6 +86,8 @@ model Review {
   createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz()
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  @@id([userId, bookId])
+  @@id([userId, itemId])
+  @@index([userId])
+  @@index([itemId])
   @@map("reviews")
 }
