@@ -1,34 +1,54 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  ParseIntPipe,
+  HttpCode,
+  Inject,
+} from '@nestjs/common';
 import { ReviewsService } from './reviews.service';
 import { CreateReviewDto } from './dto/create-review.dto';
 import { UpdateReviewDto } from './dto/update-review.dto';
+import commonConfig from '../config/common.config';
+import { ConfigType } from '@nestjs/config';
 
 @Controller('reviews')
 export class ReviewsController {
-  constructor(private readonly reviewsService: ReviewsService) {}
+  constructor(
+    @Inject(commonConfig.KEY) private config: ConfigType<typeof commonConfig>,
+    private readonly reviewsService: ReviewsService,
+  ) {}
 
   @Post()
-  create(@Body() createReviewDto: CreateReviewDto) {
-    return this.reviewsService.create(createReviewDto);
+  createReview(@Body() createReviewDto: CreateReviewDto) {
+    return this.reviewsService.createReview(createReviewDto);
   }
 
   @Get()
-  findAll() {
-    return this.reviewsService.findAll();
+  listReviews() {
+    return this.reviewsService.listReviews();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.reviewsService.findOne(+id);
+  @Get('/:id')
+  getReviewById(@Param('id', ParseIntPipe) id: number) {
+    return this.reviewsService.getReviewById(id);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateReviewDto: UpdateReviewDto) {
-    return this.reviewsService.update(+id, updateReviewDto);
+  @Patch('/:id')
+  updateReview(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() updateReviewDto: UpdateReviewDto,
+  ) {
+    return this.reviewsService.updateReview(id, updateReviewDto);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.reviewsService.remove(+id);
+  @Delete('/:id')
+  @HttpCode(204)
+  deleteReviewById(@Param('id', ParseIntPipe) id: number) {
+    return this.reviewsService.deleteReviewById(id);
   }
 }
