@@ -32,11 +32,25 @@ books: {
   updated_by: int
 }
 
+movies_draft: {
+  shape: sql_table
+
+  id: int { constraint: primary_key }
+
+  title: varchar(255)
+  original_title: varchar(255)
+
+  created_at: datetime
+  created_by: int
+  updated_at: datetime
+  updated_by: int
+}
+
 reviews: {
   shape: sql_table
 
   user_id: int { constraint: foreign_key }
-  book_id: int { constraint: foreign_key }
+  item_id: int { constraint: foreign_key }
 
   rating: int
   content: text
@@ -54,7 +68,15 @@ reviews.user_id <-> users.id {
     shape: cf-one-required
   }
 }
-reviews.book_id <-> books.id {
+reviews.item_id <-> books.id {
+  source-arrowhead: N {
+    shape: cf-many
+  }
+  target-arrowhead: 1 {
+    shape: cf-one-required
+  }
+}
+reviews.item_id <-> movies_draft.id {
   source-arrowhead: N {
     shape: cf-many
   }
