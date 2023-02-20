@@ -20,7 +20,7 @@ enum USER_ROLES {
 
 enum REVIEW_DOMAINS {
   BOOK
-  MOVIES
+  MOVIE
 }
 
 model User {

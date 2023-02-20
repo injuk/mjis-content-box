@@ -21,6 +21,7 @@ export class ReviewsRepository {
       if (review)
         throw new ConflictException(`user(${userId}), item(${itemId})`);
 
+      // TODO: item이 실제로 존재하는지 확인
       return transactionCtx.review.create({
         data,
       });
