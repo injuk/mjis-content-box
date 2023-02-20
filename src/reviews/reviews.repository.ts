@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { ConflictException, Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateReviewDto } from './dto/create-review.dto';
 import { UpdateReviewDto } from './dto/update-review.dto';
@@ -7,8 +7,24 @@ import { UpdateReviewDto } from './dto/update-review.dto';
 export class ReviewsRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  createReview(createReviewDto: CreateReviewDto) {
-    return 'This action adds a new review';
+  createReview(data: CreateReviewDto) {
+    // TODO: user 도메인이 추가되면 수정 할 것
+    const userId = 1;
+    const { itemId } = data;
+
+    return this.prisma.$transaction(async (transactionCtx) => {
+      const review = await transactionCtx.review.findUnique({
+        where: {
+          userId_itemId: { userId, itemId },
+        },
+      });
+      if (review)
+        throw new ConflictException(`user(${userId}), item(${itemId})`);
+
+      return transactionCtx.review.create({
+        data,
+      });
+    });
   }
 
   listReviews() {
