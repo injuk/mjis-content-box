@@ -51,6 +51,7 @@ reviews: {
 
   user_id: int { constraint: foreign_key }
   item_id: int { constraint: foreign_key }
+  domain: varchar(20)
 
   rating: int
   content: text
