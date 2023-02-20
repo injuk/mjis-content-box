@@ -1,6 +1,9 @@
 -- CreateEnum
 CREATE TYPE "USER_ROLES" AS ENUM ('ADMIN', 'USER', 'GUEST');
 
+-- CreateEnum
+CREATE TYPE "REVIEW_DOMAINS" AS ENUM ('BOOK', 'MOVIES');
+
 -- CreateTable
 CREATE TABLE "users" (
     "id" SERIAL NOT NULL,
@@ -45,7 +48,7 @@ CREATE TABLE "movies" (
 CREATE TABLE "reviews" (
     "user_id" INTEGER NOT NULL,
     "item_id" INTEGER NOT NULL,
-    "domain" VARCHAR(20) NOT NULL,
+    "domain" "REVIEW_DOMAINS" NOT NULL,
     "rating" INTEGER NOT NULL,
     "content" TEXT,
     "has_spoiler" BOOLEAN NOT NULL,
