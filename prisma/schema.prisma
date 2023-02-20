@@ -79,6 +79,7 @@ model Review {
   book  Book?  @relation("BOOK_HAS_MANY_REVIEWS", fields: [itemId], references: [id], onDelete: Cascade, map: "review_book")
   movie Movie? @relation("MOVIE_HAS_MANY_REVIEWS", fields: [itemId], references: [id], onDelete: Cascade, map: "review_movie")
 
+  domain     String  @map("domain") @db.VarChar(20)
   rating     Int     @map("rating")
   content    String? @map("content") @db.Text
   hasSpoiler Boolean @map("has_spoiler") @db.Boolean

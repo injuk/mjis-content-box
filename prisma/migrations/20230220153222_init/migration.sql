@@ -34,16 +34,25 @@ CREATE TABLE "books" (
 );
 
 -- CreateTable
+CREATE TABLE "movies" (
+    "id" SERIAL NOT NULL,
+    "title" VARCHAR(255) NOT NULL,
+
+    CONSTRAINT "movies_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
 CREATE TABLE "reviews" (
     "user_id" INTEGER NOT NULL,
-    "book_id" INTEGER NOT NULL,
+    "item_id" INTEGER NOT NULL,
+    "domain" VARCHAR(20) NOT NULL,
     "rating" INTEGER NOT NULL,
-    "content" TEXT NOT NULL,
+    "content" TEXT,
     "has_spoiler" BOOLEAN NOT NULL,
     "created_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
 
-    CONSTRAINT "reviews_pkey" PRIMARY KEY ("user_id","book_id")
+    CONSTRAINT "reviews_pkey" PRIMARY KEY ("user_id","item_id")
 );
 
 -- CreateIndex
@@ -52,8 +61,8 @@ CREATE UNIQUE INDEX "users_email_key" ON "users"("email");
 -- CreateIndex
 CREATE UNIQUE INDEX "books_author_isbn_key" ON "books"("author", "isbn");
 
--- AddForeignKey
-ALTER TABLE "reviews" ADD CONSTRAINT "reviews_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+-- CreateIndex
+CREATE INDEX "reviews_user_id_idx" ON "reviews"("user_id");
 
--- AddForeignKey
-ALTER TABLE "reviews" ADD CONSTRAINT "reviews_book_id_fkey" FOREIGN KEY ("book_id") REFERENCES "books"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+-- CreateIndex
+CREATE INDEX "reviews_item_id_idx" ON "reviews"("item_id");
