@@ -35,7 +35,8 @@ export class ReviewsController {
   }
 
   @Get()
-  listReviews(@Query('domain') dto: ListReviewsDto) {
+  @UsePipes(new ValidationPipe({ transform: true }))
+  listReviews(@Query() dto: ListReviewsDto) {
     return this.reviewsService.listReviews(dto);
   }
 
