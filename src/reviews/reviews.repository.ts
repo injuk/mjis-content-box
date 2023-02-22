@@ -4,6 +4,7 @@ import { CreateReviewDto } from './dto/create-review.dto';
 import { UpdateReviewDto } from './dto/update-review.dto';
 import { ReviewDomainEnum } from './enums/review-domain.enum';
 import { ListReviewsDto } from './dto/list-reviews.dto';
+import { selectReviewClause } from './domain/select-conditions.domain';
 
 @Injectable()
 export class ReviewsRepository {
@@ -39,14 +40,18 @@ export class ReviewsRepository {
           domain,
         },
       });
-
       if (_count === 0) return { totalCount: 0, results: [] };
 
+      if (domain === ReviewDomainEnum.BOOK) selectReviewClause.book = true;
+      if (domain === ReviewDomainEnum.MOVIE) selectReviewClause.movie = true;
+
+      // TODO: nextToken 방식 도입하기
       const reviews = await transactionCtx.review.findMany({
         take: 50,
         where: {
           domain,
         },
+        select: selectReviewClause,
         orderBy: {
           createdAt: 'desc',
         },
