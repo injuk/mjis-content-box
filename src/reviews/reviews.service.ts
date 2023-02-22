@@ -2,6 +2,8 @@ import { Injectable, Logger } from '@nestjs/common';
 import { CreateReviewDto } from './dto/create-review.dto';
 import { UpdateReviewDto } from './dto/update-review.dto';
 import { ReviewsRepository } from './reviews.repository';
+import { ReviewDomainEnum } from './enums/review-domain.enum';
+import { ListReviewsDto } from './dto/list-reviews.dto';
 
 @Injectable()
 export class ReviewsService {
@@ -9,12 +11,16 @@ export class ReviewsService {
 
   constructor(private readonly repository: ReviewsRepository) {}
 
-  createReview(createReviewDto: CreateReviewDto) {
-    return this.repository.createReview(createReviewDto);
+  createReview(dto: CreateReviewDto) {
+    this.logger.debug(`create new review`);
+
+    return this.repository.createReview(dto);
   }
 
-  listReviews() {
-    return this.repository.listReviews();
+  listReviews(dto: ListReviewsDto) {
+    this.logger.debug(`list reviews`);
+
+    return this.repository.listReviews(dto);
   }
 
   getReviewById(id: number) {

@@ -2,6 +2,8 @@ import { ConflictException, Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateReviewDto } from './dto/create-review.dto';
 import { UpdateReviewDto } from './dto/update-review.dto';
+import { ReviewDomainEnum } from './enums/review-domain.enum';
+import { ListReviewsDto } from './dto/list-reviews.dto';
 
 @Injectable()
 export class ReviewsRepository {
@@ -28,8 +30,30 @@ export class ReviewsRepository {
     });
   }
 
-  listReviews() {
-    return `This action returns all reviews`;
+  listReviews(data: ListReviewsDto) {
+    const { domain } = data;
+    return this.prisma.$transaction(async (transactionCtx) => {
+      const { _count } = await transactionCtx.review.aggregate({
+        _count: true,
+        where: {
+          domain,
+        },
+      });
+
+      if (_count === 0) return { totalCount: 0, results: [] };
+
+      const reviews = await transactionCtx.review.findMany({
+        take: 50,
+        where: {
+          domain,
+        },
+        orderBy: {
+          createdAt: 'desc',
+        },
+      });
+
+      return { totalCount: _count, results: reviews };
+    });
   }
 
   getReviewById(id: number) {

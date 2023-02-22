@@ -11,12 +11,15 @@ import {
   Inject,
   UsePipes,
   ValidationPipe,
+  Query,
 } from '@nestjs/common';
 import { ReviewsService } from './reviews.service';
 import { CreateReviewDto } from './dto/create-review.dto';
 import { UpdateReviewDto } from './dto/update-review.dto';
 import commonConfig from '../config/common.config';
 import { ConfigType } from '@nestjs/config';
+import { ReviewDomainEnum } from './enums/review-domain.enum';
+import { ListReviewsDto } from './dto/list-reviews.dto';
 
 @Controller('reviews')
 export class ReviewsController {
@@ -27,13 +30,13 @@ export class ReviewsController {
 
   @Post()
   @UsePipes(new ValidationPipe({ transform: true }))
-  createReview(@Body() createReviewDto: CreateReviewDto) {
-    return this.reviewsService.createReview(createReviewDto);
+  createReview(@Body() dto: CreateReviewDto) {
+    return this.reviewsService.createReview(dto);
   }
 
   @Get()
-  listReviews() {
-    return this.reviewsService.listReviews();
+  listReviews(@Query('domain') dto: ListReviewsDto) {
+    return this.reviewsService.listReviews(dto);
   }
 
   @Get('/:id')
