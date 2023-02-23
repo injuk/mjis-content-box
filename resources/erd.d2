@@ -49,8 +49,10 @@ movies_draft: {
 reviews: {
   shape: sql_table
 
-  user_id: int { constraint: foreign_key }
-  item_id: int { constraint: foreign_key }
+  id: int { constraint: primary_key }
+
+  user_id: int { constraint: unique }
+  item_id: int { constraint: unique }
   domain: varchar(20)
 
   rating: int
