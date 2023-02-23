@@ -1,9 +1,9 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { CreateReviewDto } from './dto/create-review.dto';
 import { UpdateReviewDto } from './dto/update-review.dto';
 import { ReviewsRepository } from './reviews.repository';
-import { ReviewDomainEnum } from './enums/review-domain.enum';
 import { ListReviewsDto } from './dto/list-reviews.dto';
+import { GetReviewDto } from './dto/get-review.dto';
 
 @Injectable()
 export class ReviewsService {
@@ -18,13 +18,20 @@ export class ReviewsService {
   }
 
   listReviews(dto: ListReviewsDto) {
-    this.logger.debug(`list reviews`);
+    const { domain } = dto;
+    this.logger.debug(`list reviews with domain ${domain}`);
 
-    return this.repository.listReviews(dto);
+    return this.repository.listReviews(domain);
   }
 
-  getReviewById(id: number) {
-    return this.repository.getReviewById(id);
+  async getReviewById(id: number, dto: GetReviewDto) {
+    const { domain } = dto;
+    this.logger.debug(`get review by id with domain ${domain}`);
+
+    const result = await this.repository.getReviewById(id, domain);
+    if (!result) throw new NotFoundException(`review_id(${id})`);
+
+    return result;
   }
 
   updateReview(id: number, updateReviewDto: UpdateReviewDto) {

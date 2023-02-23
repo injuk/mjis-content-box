@@ -18,8 +18,8 @@ import { CreateReviewDto } from './dto/create-review.dto';
 import { UpdateReviewDto } from './dto/update-review.dto';
 import commonConfig from '../config/common.config';
 import { ConfigType } from '@nestjs/config';
-import { ReviewDomainEnum } from './enums/review-domain.enum';
 import { ListReviewsDto } from './dto/list-reviews.dto';
+import { GetReviewDto } from './dto/get-review.dto';
 
 @Controller('reviews')
 export class ReviewsController {
@@ -41,8 +41,12 @@ export class ReviewsController {
   }
 
   @Get('/:id')
-  getReviewById(@Param('id', ParseIntPipe) id: number) {
-    return this.reviewsService.getReviewById(id);
+  @UsePipes(new ValidationPipe({ transform: true }))
+  getReviewById(
+    @Param('id', ParseIntPipe) id: number,
+    @Query() dto: GetReviewDto,
+  ) {
+    return this.reviewsService.getReviewById(id, dto);
   }
 
   @Patch('/:id')
