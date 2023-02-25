@@ -1,4 +1,8 @@
-import { ConflictException, Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateReviewDto } from './dto/create-review.dto';
 import { UpdateReviewDto } from './dto/update-review.dto';
@@ -17,7 +21,7 @@ export class ReviewsRepository {
     return this.prisma.$transaction(async (transactionCtx) => {
       const review = await transactionCtx.review.findUnique({
         where: {
-          userId_itemId: { userId, itemId },
+          UQ_USER_ITEM: { userId, itemId },
         },
       });
       if (review)
@@ -66,16 +70,19 @@ export class ReviewsRepository {
   }
 
   // TODO: user 도메인이 추가되면 수정 할 것
-  // TODO: review Id를 review 도메인에 추가하고,user_id와 item_id는 UQ로 수정할 것
   getReviewById(id: number, domain: ReviewDomainEnum) {
-    return this.prisma.review.findUnique({
-      where: {
-        userId_itemId: {
-          userId: 1,
-          itemId: id,
+    return this.prisma.$transaction(async (transactionCtx) => {
+      const review = await transactionCtx.review.findUnique({
+        where: {
+          id,
         },
-      },
-      select: this.createSelectClause(domain),
+        select: this.createSelectClause(domain),
+      });
+
+      if (review.domain !== domain)
+        throw new NotFoundException(`domain(${domain}), item(${id})`);
+
+      return review;
     });
   }
 

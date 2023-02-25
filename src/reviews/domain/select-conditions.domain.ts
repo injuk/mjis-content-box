@@ -1,4 +1,5 @@
 interface SelectConditionsDomain {
+  id: true;
   userId: true;
   domain: true;
   rating: true;
@@ -11,6 +12,7 @@ interface SelectConditionsDomain {
 }
 
 export const selectReviewClause: SelectConditionsDomain = {
+  id: true,
   userId: true,
   domain: true,
   rating: true,

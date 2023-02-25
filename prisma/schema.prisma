@@ -76,6 +76,8 @@ model Movie {
 }
 
 model Review {
+  id Int @id @default(autoincrement()) @map("id")
+
   userId Int  @map("user_id")
   user   User @relation("USER_HAS_MANY_REVIEWS", fields: [userId], references: [id], onDelete: Cascade)
 
@@ -92,7 +94,7 @@ model Review {
   createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz()
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  @@id([userId, itemId])
+  @@unique(name: "UQ_USER_ITEM", fields: [userId, itemId])
   @@index([userId])
   @@index([itemId])
   @@map("reviews")
