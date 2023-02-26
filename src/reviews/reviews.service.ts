@@ -34,8 +34,10 @@ export class ReviewsService {
     return result;
   }
 
-  updateReview(id: number, updateReviewDto: UpdateReviewDto) {
-    return this.repository.updateReview(id, updateReviewDto);
+  updateReview(id: number, dto: UpdateReviewDto) {
+    this.logger.debug(`update review by id`);
+
+    return this.repository.updateReview(id, dto);
   }
 
   deleteReviewById(id: number) {

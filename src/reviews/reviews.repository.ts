@@ -86,8 +86,20 @@ export class ReviewsRepository {
     });
   }
 
-  updateReview(id: number, updateReviewDto: UpdateReviewDto) {
-    return `This action updates a #${id} review`;
+  updateReview(id: number, dto: UpdateReviewDto) {
+    return this.prisma.$transaction(async (transactionCtx) => {
+      const review = await transactionCtx.review.findUnique({
+        where: {
+          id,
+        },
+      });
+      if (!review) throw new NotFoundException(`item(${id})`);
+
+      return transactionCtx.review.update({
+        where: { id },
+        data: { ...dto },
+      });
+    });
   }
 
   deleteReviewById(id: number) {

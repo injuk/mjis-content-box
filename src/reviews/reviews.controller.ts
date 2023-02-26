@@ -53,9 +53,9 @@ export class ReviewsController {
   @UsePipes(new ValidationPipe({ transform: true }))
   updateReview(
     @Param('id', ParseIntPipe) id: number,
-    @Body() updateReviewDto: UpdateReviewDto,
+    @Body() dto: UpdateReviewDto,
   ) {
-    return this.reviewsService.updateReview(id, updateReviewDto);
+    return this.reviewsService.updateReview(id, dto);
   }
 
   @Delete('/:id')
