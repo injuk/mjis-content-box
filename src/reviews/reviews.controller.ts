@@ -20,6 +20,7 @@ import commonConfig from '../config/common.config';
 import { ConfigType } from '@nestjs/config';
 import { ListReviewsDto } from './dto/list-reviews.dto';
 import { GetReviewDto } from './dto/get-review.dto';
+import { UpdateReviewDtoPipe } from './pipes/update-review-dto.pipe';
 
 @Controller('reviews')
 export class ReviewsController {
@@ -53,7 +54,7 @@ export class ReviewsController {
   @UsePipes(new ValidationPipe({ transform: true }))
   updateReview(
     @Param('id', ParseIntPipe) id: number,
-    @Body() dto: UpdateReviewDto,
+    @Body(UpdateReviewDtoPipe) dto: UpdateReviewDto,
   ) {
     return this.reviewsService.updateReview(id, dto);
   }

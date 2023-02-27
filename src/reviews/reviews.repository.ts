@@ -28,9 +28,7 @@ export class ReviewsRepository {
         throw new ConflictException(`user(${userId}), item(${itemId})`);
 
       // TODO: item이 실제로 존재하는지 확인
-      return transactionCtx.review.create({
-        data,
-      });
+      return transactionCtx.review.create({ data });
     });
   }
 
@@ -38,22 +36,16 @@ export class ReviewsRepository {
     return this.prisma.$transaction(async (transactionCtx) => {
       const { _count } = await transactionCtx.review.aggregate({
         _count: true,
-        where: {
-          domain,
-        },
+        where: { domain },
       });
       if (_count === 0) return { totalCount: 0, results: [] };
 
       // TODO: nextToken 방식 도입하기
       const reviews = await transactionCtx.review.findMany({
         take: 50,
-        where: {
-          domain,
-        },
+        where: { domain },
         select: this.createSelectClause(domain),
-        orderBy: {
-          createdAt: 'desc',
-        },
+        orderBy: { createdAt: 'desc' },
       });
 
       return { totalCount: _count, results: reviews };
@@ -73,25 +65,22 @@ export class ReviewsRepository {
   getReviewById(id: number, domain: ReviewDomainEnum) {
     return this.prisma.$transaction(async (transactionCtx) => {
       const review = await transactionCtx.review.findUnique({
-        where: {
-          id,
-        },
+        where: { id },
         select: this.createSelectClause(domain),
       });
 
-      if (review.domain !== domain)
+      if (review?.domain !== domain)
         throw new NotFoundException(`domain(${domain}), item(${id})`);
 
-      return review;
+      return Promise.resolve(review);
     });
   }
 
+  // TODO: domain 개념 도입하기
   updateReview(id: number, dto: UpdateReviewDto) {
     return this.prisma.$transaction(async (transactionCtx) => {
       const review = await transactionCtx.review.findUnique({
-        where: {
-          id,
-        },
+        where: { id },
       });
       if (!review) throw new NotFoundException(`item(${id})`);
 
@@ -102,7 +91,17 @@ export class ReviewsRepository {
     });
   }
 
+  // TODO: dto를 추가하고 domain 개념 도입하기
   deleteReviewById(id: number) {
-    return `This action removes a #${id} review`;
+    return this.prisma.$transaction(async (transactionCtx) => {
+      const review = await transactionCtx.review.findUnique({
+        where: { id },
+      });
+      if (!review) throw new NotFoundException(`item(${id})`);
+
+      return transactionCtx.review.delete({
+        where: { id },
+      });
+    });
   }
 }

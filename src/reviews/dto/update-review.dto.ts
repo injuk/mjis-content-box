@@ -1,10 +1,4 @@
-import {
-  IsBoolean,
-  IsNotEmpty,
-  IsOptional,
-  IsString,
-  Validate,
-} from 'class-validator';
+import { IsBoolean, IsOptional, IsString, Validate } from 'class-validator';
 import { ValidRating } from '../validators/rating.validator';
 import { Transform } from 'class-transformer';
 import Utility from '../../common/util';
@@ -21,6 +15,7 @@ export class UpdateReviewDto {
   @Transform(Utility.trimWhenStringValue)
   readonly content: string;
 
+  @IsBoolean()
   @IsOptional()
   readonly hasSpoiler: boolean;
 }
