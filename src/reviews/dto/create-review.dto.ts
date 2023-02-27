@@ -6,12 +6,8 @@ import {
   IsOptional,
   IsPositive,
   IsString,
-  Validate,
 } from 'class-validator';
-import Utility from '../../common/util';
-import { Transform } from 'class-transformer';
 import { ReviewDomainEnum } from '../enums/review-domain.enum';
-import { ValidDomain } from '../validators/domain.validator';
 
 export class CreateReviewDto {
   @IsInt()
@@ -23,10 +19,6 @@ export class CreateReviewDto {
   readonly itemId: number;
 
   @IsString()
-  @Validate(ValidDomain, {
-    message: `invalid domain`,
-  })
-  @Transform(Utility.toUpperCase)
   readonly domain: ReviewDomainEnum;
 
   @IsNotEmpty()
@@ -35,7 +27,6 @@ export class CreateReviewDto {
 
   @IsString()
   @IsOptional()
-  @Transform(Utility.trimWhenStringValue)
   readonly content: string;
 
   @IsBoolean()

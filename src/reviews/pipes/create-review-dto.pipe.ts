@@ -3,25 +3,32 @@ import {
   BadRequestException,
   PipeTransform,
 } from '@nestjs/common';
+import { ReviewDomainEnum } from '../enums/review-domain.enum';
 
-export class UpdateReviewDtoPipe implements PipeTransform {
+export class CreateReviewDtoPipe implements PipeTransform {
   transform(dto: any, metadata: ArgumentMetadata): any {
     const errorMessages = [];
 
-    if (!Object.keys(dto).length)
-      errorMessages.push(`update review payload is empty`);
+    const { domain, rating, content } = dto;
+    if (!this.isValidDomain(domain))
+      errorMessages.push(`invalid domain(${domain})`);
+    dto.domain = domain.toUpperCase();
 
-    const { rating, content, hasSpoiler } = dto;
     if (!this.isValidRating(rating))
       errorMessages.push(`rating must be 0 <= rating < 5 or a multiple of 0.5`);
-
-    if (!this.isValidHasSpoiler(hasSpoiler))
-      errorMessages.push(`invalid hasSpoiler(${hasSpoiler})`);
 
     dto.content = typeof content === 'string' ? content.trim() : '';
 
     if (errorMessages.length) throw new BadRequestException(errorMessages);
     return dto;
+  }
+
+  private isValidDomain(rawDomain = '') {
+    const domain = rawDomain?.toUpperCase ? rawDomain.toUpperCase() : rawDomain;
+
+    if (!domain) return false;
+
+    return domain in ReviewDomainEnum;
   }
 
   private isValidRating(rating = 0) {
@@ -36,11 +43,5 @@ export class UpdateReviewDtoPipe implements PipeTransform {
     if (target < min || target > max) return false;
 
     return target === 0 || Math.abs((target * 10) % criteria) === 0;
-  }
-
-  private isValidHasSpoiler(hasSpoiler) {
-    if (hasSpoiler === null) return false;
-
-    return hasSpoiler ? typeof hasSpoiler === 'boolean' : true;
   }
 }

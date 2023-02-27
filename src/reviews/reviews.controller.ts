@@ -21,6 +21,9 @@ import { ConfigType } from '@nestjs/config';
 import { ListReviewsDto } from './dto/list-reviews.dto';
 import { GetReviewDto } from './dto/get-review.dto';
 import { UpdateReviewDtoPipe } from './pipes/update-review-dto.pipe';
+import { CreateReviewDtoPipe } from './pipes/create-review-dto.pipe';
+import { ListReviewsDtoPipe } from './pipes/list-review-dto.pipe';
+import { GetReviewDtoPipe } from './pipes/get-review-dto.pipe';
 
 @Controller('reviews')
 export class ReviewsController {
@@ -31,13 +34,13 @@ export class ReviewsController {
 
   @Post()
   @UsePipes(new ValidationPipe({ transform: true }))
-  createReview(@Body() dto: CreateReviewDto) {
+  createReview(@Body(CreateReviewDtoPipe) dto: CreateReviewDto) {
     return this.reviewsService.createReview(dto);
   }
 
   @Get()
   @UsePipes(new ValidationPipe({ transform: true }))
-  listReviews(@Query() dto: ListReviewsDto) {
+  listReviews(@Query(ListReviewsDtoPipe) dto: ListReviewsDto) {
     return this.reviewsService.listReviews(dto);
   }
 
@@ -45,7 +48,7 @@ export class ReviewsController {
   @UsePipes(new ValidationPipe({ transform: true }))
   getReviewById(
     @Param('id', ParseIntPipe) id: number,
-    @Query() dto: GetReviewDto,
+    @Query(GetReviewDtoPipe) dto: GetReviewDto,
   ) {
     return this.reviewsService.getReviewById(id, dto);
   }
