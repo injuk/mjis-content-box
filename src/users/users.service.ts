@@ -14,17 +14,20 @@ export class UsersService {
 
   constructor(private readonly repository: UsersRepository) {}
 
-  signUp(dto: CreateUserDto) {
+  createUser(dto: CreateUserDto) {
     return this.repository.createUser(dto);
-  }
-
-  signIn() {
-    return 'log in!';
   }
 
   async getUserById(id: number) {
     const result = await this.repository.getUserById(id);
     if (!result) throw new NotFoundException(`user_id(${id})`);
+
+    return result;
+  }
+
+  async getUserByEmail(email: string) {
+    const result = await this.repository.getUserByEmail(email);
+    if (!result) throw new NotFoundException(`user_email(${email})`);
 
     return result;
   }

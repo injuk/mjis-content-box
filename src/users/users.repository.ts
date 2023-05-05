@@ -36,6 +36,13 @@ export class UsersRepository {
     });
   }
 
+  getUserByEmail(email: string) {
+    return this.prisma.user.findUnique({
+      where: { email },
+      select: selectUserClause,
+    });
+  }
+
   updateMe(id: number, dto: UpdateUserDto) {
     return this.prisma.$transaction(async (transActionCtx) => {
       const user = await transActionCtx.user.findUnique({
