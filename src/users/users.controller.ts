@@ -14,13 +14,16 @@ import {
   HttpCode,
   BadRequestException,
   UseGuards,
-  forwardRef,
+  Req,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { UpdateUserDto } from './dto/update-user.dto';
 import commonConfig from '../config/common.config';
 import { ConfigType } from '@nestjs/config';
-import { AuthGuard } from '../auth/auth.guard';
+import { SignUpDto } from './dto/sign-up.dto';
+import { SignInDto } from './dto/sign-in.dto';
+import { UserGuard } from './user.guard';
 
 @Controller('users')
 export class UsersController {
@@ -34,18 +37,32 @@ export class UsersController {
     return this.usersService.getUserById(id);
   }
 
-  // @UseGuards(AuthGuard)
+  @UseGuards(UserGuard)
   @Patch('/me')
   @UsePipes(new ValidationPipe())
-  updateMe(@Headers() headers: any, @Body() dto: UpdateUserDto) {
+  updateMe(@Req() req, @Body() dto: UpdateUserDto) {
     if (!Object.keys(dto).length) throw new BadRequestException(`empty data`);
 
-    return this.usersService.updateMe(dto);
+    return this.usersService.updateMe(req.user, dto);
   }
 
+  @UseGuards(UserGuard)
   @Delete('/me')
   @HttpCode(204)
-  deleteMe() {
-    return this.usersService.deleteMe();
+  deleteMe(@Req() req) {
+    return this.usersService.deleteMe(req.user);
+  }
+
+  @Post('/sign-up')
+  @UsePipes(new ValidationPipe())
+  signUp(@Body() dto: SignUpDto) {
+    return this.usersService.createUser(dto);
+  }
+
+  @Post('/sign-in')
+  @UsePipes(new ValidationPipe())
+  @HttpCode(200)
+  signIn(@Body() dto: SignInDto) {
+    return this.usersService.signIn(dto);
   }
 }
