@@ -1,6 +1,7 @@
 import { ConflictException, Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateUserDto } from './dto/create-user.dto';
+import { selectUserClause } from './domain/select-conditions.user';
 
 @Injectable()
 export class UsersRepository {
@@ -20,6 +21,13 @@ export class UsersRepository {
       return transActionCtx.user.create({
         data,
       });
+    });
+  }
+
+  getUserById(id: number) {
+    return this.prisma.user.findUnique({
+      where: { id },
+      select: selectUserClause,
     });
   }
 }
