@@ -3,6 +3,7 @@ import {
   Body,
   Controller,
   Delete,
+  ForbiddenException,
   Get,
   HttpCode,
   Inject,
@@ -10,6 +11,8 @@ import {
   ParseIntPipe,
   Patch,
   Post,
+  Req,
+  UseGuards,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
@@ -18,6 +21,8 @@ import commonConfig from 'src/config/common.config';
 import { BooksService } from './books.service';
 import { CreateBookDto } from './dto/create-book.dto';
 import { UpdateBookDto } from './dto/update-book.dto';
+import { UserGuard } from '../users/user.guard';
+import { UserRoles } from '../common/enums/user-roles.enum';
 
 @Controller('books')
 export class BooksController {
@@ -26,10 +31,14 @@ export class BooksController {
     private readonly booksService: BooksService,
   ) {}
 
+  @UseGuards(UserGuard)
   @Post()
   @UsePipes(new ValidationPipe({ transform: true }))
-  createBook(@Body() dto: CreateBookDto) {
-    return this.booksService.createBook(dto);
+  createBook(@Req() req, @Body() dto: CreateBookDto) {
+    if (req.user.role !== UserRoles.ADMIN)
+      throw new ForbiddenException(`role must be ${UserRoles.ADMIN}`);
+
+    return this.booksService.createBook(req.user, dto);
   }
 
   @Get()
@@ -43,21 +52,30 @@ export class BooksController {
     return this.booksService.getBookById(id);
   }
 
+  @UseGuards(UserGuard)
   @Patch('/:id')
   @UsePipes(new ValidationPipe({ transform: true }))
   updateBook(
+    @Req() req,
     @Param('id', ParseIntPipe) id: number,
     @Body() dto: UpdateBookDto,
   ) {
+    if (req.user.role !== UserRoles.ADMIN)
+      throw new ForbiddenException(`role must be ${UserRoles.ADMIN}`);
+
     // TODO: 더 우아한 방법은 없을까...?
     if (!Object.keys(dto).length) throw new BadRequestException(`empty data`);
 
-    return this.booksService.updateBook(id, dto);
+    return this.booksService.updateBook(req.user, id, dto);
   }
 
+  @UseGuards(UserGuard)
   @Delete('/:id')
   @HttpCode(204)
-  async deleteBookById(@Param('id', ParseIntPipe) id: number) {
-    return this.booksService.deleteBookById(id);
+  async deleteBookById(@Req() req, @Param('id', ParseIntPipe) id: number) {
+    if (req.user.role !== UserRoles.ADMIN)
+      throw new ForbiddenException(`role must be ${UserRoles.ADMIN}`);
+
+    return this.booksService.deleteBookById(req.user, id);
   }
 }

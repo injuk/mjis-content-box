@@ -14,6 +14,13 @@ export class BooksRepository {
     const { author, isbn } = data;
 
     return this.prisma.$transaction(async (transactionCtx) => {
+      const user = await transactionCtx.user.findUnique({
+        where: {
+          id: data.createdBy,
+        },
+      });
+      if (!user) throw new NotFoundException(`user_id(${data.createdBy})`);
+
       const book = await transactionCtx.book.findUnique({
         where: {
           UQ_AUTHOR_ISBN: { author, isbn },
@@ -50,8 +57,15 @@ export class BooksRepository {
     });
   }
 
-  updateBook(id: number, dto: UpdateBookDto) {
+  updateBook(userId: number, id: number, dto: UpdateBookDto) {
     return this.prisma.$transaction(async (transactionCtx) => {
+      const user = await transactionCtx.user.findUnique({
+        where: {
+          id: userId,
+        },
+      });
+      if (!user) throw new NotFoundException(`user_id(${userId})`);
+
       const book = await transactionCtx.book.findUnique({
         where: { id },
       });
@@ -59,13 +73,20 @@ export class BooksRepository {
 
       return transactionCtx.book.update({
         where: { id },
-        data: { ...dto },
+        data: { ...dto, updatedBy: userId },
       });
     });
   }
 
-  deleteBookById(id: number) {
+  deleteBookById(userId: number, id: number) {
     return this.prisma.$transaction(async (transactionCtx) => {
+      const user = await transactionCtx.user.findUnique({
+        where: {
+          id: userId,
+        },
+      });
+      if (!user) throw new NotFoundException(`user_id(${userId})`);
+
       const book = await transactionCtx.book.findUnique({
         where: { id },
       });

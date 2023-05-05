@@ -9,7 +9,7 @@ export class BooksService {
 
   constructor(private readonly repository: BooksRepository) {}
 
-  createBook(dto: CreateBookDto) {
+  createBook(user, dto: CreateBookDto) {
     this.logger.debug(`create new book`);
 
     const data = {
@@ -23,8 +23,8 @@ export class BooksService {
       coverUrl: dto.coverUrl,
 
       // TODO: users API가 도입되면 수정할 것
-      createdBy: 1,
-      updatedBy: 1,
+      createdBy: user.id,
+      updatedBy: user.id,
     };
 
     return this.repository.createBook(data);
@@ -46,15 +46,15 @@ export class BooksService {
     return result;
   }
 
-  updateBook(id: number, dto: UpdateBookDto) {
+  updateBook(user, id: number, dto: UpdateBookDto) {
     this.logger.debug(`update book`);
 
-    return this.repository.updateBook(id, dto);
+    return this.repository.updateBook(user.id, id, dto);
   }
 
-  deleteBookById(id: number) {
+  deleteBookById(user, id: number) {
     this.logger.debug(`delete book`);
 
-    return this.repository.deleteBookById(id);
+    return this.repository.deleteBookById(user.id, id);
   }
 }
