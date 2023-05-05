@@ -11,6 +11,7 @@ import {
   ValidationPipe,
   ParseIntPipe,
   HttpCode,
+  BadRequestException,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -27,13 +28,13 @@ export class UsersController {
   ) {}
 
   @Post()
-  @UsePipes(new ValidationPipe({ transform: true }))
+  @UsePipes(new ValidationPipe())
   signUp(@Body() dto: CreateUserDto) {
     return this.usersService.signUp(dto);
   }
 
   @Post('/sign-in')
-  @UsePipes(new ValidationPipe({ transform: true }))
+  @UsePipes(new ValidationPipe())
   signIn(@Body() dto: SignInDto) {
     return this.usersService.signIn();
   }
@@ -43,17 +44,17 @@ export class UsersController {
     return this.usersService.getUserById(id);
   }
 
-  @Patch('/:id')
-  updateUser(
-    @Param('id', ParseIntPipe) id: number,
-    @Body() updateUserDto: UpdateUserDto,
-  ) {
-    return this.usersService.updateUser(id, updateUserDto);
+  @Patch('/me')
+  @UsePipes(new ValidationPipe())
+  updateMe(@Body() dto: UpdateUserDto) {
+    if (!Object.keys(dto).length) throw new BadRequestException(`empty data`);
+
+    return this.usersService.updateMe(dto);
   }
 
-  @Delete('/:id')
+  @Delete('/me')
   @HttpCode(204)
-  deleteUser(@Param('id', ParseIntPipe) id: number) {
-    return this.usersService.deleteUser(id);
+  deleteMe() {
+    return this.usersService.deleteMe();
   }
 }

@@ -1,4 +1,9 @@
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  Logger,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UsersRepository } from './users.repository';
@@ -24,11 +29,19 @@ export class UsersService {
     return result;
   }
 
-  updateUser(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
+  updateMe(dto: UpdateUserDto) {
+    // TODO: 로그인 기능 구현 후 수정 필요
+    const id = 2;
+    if (!id) throw new BadRequestException(`id should not be empty`);
+
+    return this.repository.updateMe(id, dto);
   }
 
-  deleteUser(id: number) {
-    return `This action removes a #${id} user`;
+  deleteMe() {
+    // TODO: 로그인 기능 구현 후 수정 필요
+    const id = 2;
+    if (!id) throw new BadRequestException(`id should not be empty`);
+
+    return this.repository.deleteMe(id);
   }
 }
