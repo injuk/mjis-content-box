@@ -12,10 +12,6 @@ import { ReviewDomainEnum } from '../enums/review-domain.enum';
 export class CreateReviewDto {
   @IsInt()
   @IsPositive()
-  readonly userId: number;
-
-  @IsInt()
-  @IsPositive()
   readonly itemId: number;
 
   @IsString()

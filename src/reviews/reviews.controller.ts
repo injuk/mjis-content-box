@@ -12,6 +12,9 @@ import {
   UsePipes,
   ValidationPipe,
   Query,
+  UseGuards,
+  ForbiddenException,
+  Req,
 } from '@nestjs/common';
 import { ReviewsService } from './reviews.service';
 import { CreateReviewDto } from './dto/create-review.dto';
@@ -24,6 +27,8 @@ import { UpdateReviewDtoPipe } from './pipes/update-review-dto.pipe';
 import { CreateReviewDtoPipe } from './pipes/create-review-dto.pipe';
 import { ListReviewsDtoPipe } from './pipes/list-review-dto.pipe';
 import { GetReviewDtoPipe } from './pipes/get-review-dto.pipe';
+import { UserGuard } from '../users/user.guard';
+import { UserRoles } from '../common/enums/user-roles.enum';
 
 @Controller('reviews')
 export class ReviewsController {
@@ -32,10 +37,14 @@ export class ReviewsController {
     private readonly reviewsService: ReviewsService,
   ) {}
 
+  @UseGuards(UserGuard)
   @Post()
   @UsePipes(new ValidationPipe({ transform: true }))
-  createReview(@Body(CreateReviewDtoPipe) dto: CreateReviewDto) {
-    return this.reviewsService.createReview(dto);
+  createReview(@Req() req, @Body(CreateReviewDtoPipe) dto: CreateReviewDto) {
+    if (req.user.role === UserRoles.GUEST)
+      throw new ForbiddenException(`${UserRoles.GUEST} cannot write review`);
+
+    return this.reviewsService.createReview(req.user, dto);
   }
 
   @Get()
@@ -53,18 +62,27 @@ export class ReviewsController {
     return this.reviewsService.getReviewById(id, dto);
   }
 
+  @UseGuards(UserGuard)
   @Patch('/:id')
   @UsePipes(new ValidationPipe({ transform: true }))
   updateReview(
+    @Req() req,
     @Param('id', ParseIntPipe) id: number,
     @Body(UpdateReviewDtoPipe) dto: UpdateReviewDto,
   ) {
-    return this.reviewsService.updateReview(id, dto);
+    if (req.user.role === UserRoles.GUEST)
+      throw new ForbiddenException(`${UserRoles.GUEST} cannot write review`);
+
+    return this.reviewsService.updateReview(req.user, id, dto);
   }
 
+  @UseGuards(UserGuard)
   @Delete('/:id')
   @HttpCode(204)
-  deleteReviewById(@Param('id', ParseIntPipe) id: number) {
-    return this.reviewsService.deleteReviewById(id);
+  deleteReviewById(@Req() req, @Param('id', ParseIntPipe) id: number) {
+    if (req.user.role === UserRoles.GUEST)
+      throw new ForbiddenException(`${UserRoles.GUEST} cannot write review`);
+
+    return this.reviewsService.deleteReviewById(req.user, id);
   }
 }

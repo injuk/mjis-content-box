@@ -32,6 +32,12 @@ export class UsersController {
     private readonly usersService: UsersService,
   ) {}
 
+  @UseGuards(UserGuard)
+  @Get('/me')
+  whoAmI(@Req() req) {
+    return req.user;
+  }
+
   @Get('/:id')
   getUserById(@Param('id', ParseIntPipe) id: number) {
     return this.usersService.getUserById(id);

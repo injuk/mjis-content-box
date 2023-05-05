@@ -1,5 +1,6 @@
 import {
   ConflictException,
+  ForbiddenException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -14,11 +15,18 @@ export class ReviewsRepository {
   constructor(private readonly prisma: PrismaService) {}
 
   // TODO: user 도메인이 추가되면 수정 할 것
-  createReview(data: CreateReviewDto) {
-    const userId = 1;
-    const { itemId } = data;
+  createReview(user, param: CreateReviewDto) {
+    const userId: number = user.id;
+    const { itemId } = param;
 
     return this.prisma.$transaction(async (transactionCtx) => {
+      const user = await transactionCtx.user.findUnique({
+        where: {
+          id: userId,
+        },
+      });
+      if (!user) throw new NotFoundException(`user_id(${userId})`);
+
       const review = await transactionCtx.review.findUnique({
         where: {
           UQ_USER_ITEM: { userId, itemId },
@@ -28,6 +36,7 @@ export class ReviewsRepository {
         throw new ConflictException(`user(${userId}), item(${itemId})`);
 
       // TODO: item이 실제로 존재하는지 확인
+      const data = { ...param, userId };
       return transactionCtx.review.create({ data });
     });
   }
@@ -77,12 +86,21 @@ export class ReviewsRepository {
   }
 
   // TODO: domain 개념 도입하기
-  updateReview(id: number, dto: UpdateReviewDto) {
+  updateReview(userId: number, id: number, dto: UpdateReviewDto) {
     return this.prisma.$transaction(async (transactionCtx) => {
+      const user = await transactionCtx.user.findUnique({
+        where: {
+          id: userId,
+        },
+      });
+      if (!user) throw new NotFoundException(`user_id(${userId})`);
+
       const review = await transactionCtx.review.findUnique({
         where: { id },
       });
       if (!review) throw new NotFoundException(`item(${id})`);
+      if (review.userId !== userId)
+        throw new ForbiddenException(`cannot update someone else's review`);
 
       return transactionCtx.review.update({
         where: { id },
@@ -92,12 +110,21 @@ export class ReviewsRepository {
   }
 
   // TODO: dto를 추가하고 domain 개념 도입하기
-  deleteReviewById(id: number) {
+  deleteReviewById(userId: number, id: number) {
     return this.prisma.$transaction(async (transactionCtx) => {
+      const user = await transactionCtx.user.findUnique({
+        where: {
+          id: userId,
+        },
+      });
+      if (!user) throw new NotFoundException(`user_id(${userId})`);
+
       const review = await transactionCtx.review.findUnique({
         where: { id },
       });
       if (!review) throw new NotFoundException(`item(${id})`);
+      if (review.userId !== userId)
+        throw new ForbiddenException(`cannot delete someone else's review`);
 
       return transactionCtx.review.delete({
         where: { id },

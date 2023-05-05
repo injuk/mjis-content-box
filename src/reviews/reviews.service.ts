@@ -11,10 +11,10 @@ export class ReviewsService {
 
   constructor(private readonly repository: ReviewsRepository) {}
 
-  createReview(dto: CreateReviewDto) {
+  createReview(user, dto: CreateReviewDto) {
     this.logger.debug(`create new review`);
 
-    return this.repository.createReview(dto);
+    return this.repository.createReview(user, dto);
   }
 
   listReviews(dto: ListReviewsDto) {
@@ -34,13 +34,13 @@ export class ReviewsService {
     return result;
   }
 
-  updateReview(id: number, dto: UpdateReviewDto) {
+  updateReview(user, id: number, dto: UpdateReviewDto) {
     this.logger.debug(`update review by id`);
 
-    return this.repository.updateReview(id, dto);
+    return this.repository.updateReview(user.id, id, dto);
   }
 
-  deleteReviewById(id: number) {
-    return this.repository.deleteReviewById(id);
+  deleteReviewById(user, id: number) {
+    return this.repository.deleteReviewById(user.id, id);
   }
 }
