@@ -3,6 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 import { BooksModule } from './books/books.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { ReviewsModule } from './reviews/reviews.module';
+import { UsersModule } from './users/users.module';
 import commonConfig from './config/common.config';
 
 @Module({
@@ -15,6 +16,7 @@ import commonConfig from './config/common.config';
     BooksModule,
     PrismaModule,
     ReviewsModule,
+    UsersModule,
   ],
   controllers: [],
   providers: [],
