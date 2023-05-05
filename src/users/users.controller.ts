@@ -3,6 +3,7 @@ import {
   Get,
   Post,
   Body,
+  Headers,
   Patch,
   Param,
   Delete,
@@ -12,11 +13,14 @@ import {
   ParseIntPipe,
   HttpCode,
   BadRequestException,
+  UseGuards,
+  forwardRef,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { UpdateUserDto } from './dto/update-user.dto';
 import commonConfig from '../config/common.config';
 import { ConfigType } from '@nestjs/config';
+import { AuthGuard } from '../auth/auth.guard';
 
 @Controller('users')
 export class UsersController {
@@ -30,9 +34,10 @@ export class UsersController {
     return this.usersService.getUserById(id);
   }
 
+  // @UseGuards(AuthGuard)
   @Patch('/me')
   @UsePipes(new ValidationPipe())
-  updateMe(@Body() dto: UpdateUserDto) {
+  updateMe(@Headers() headers: any, @Body() dto: UpdateUserDto) {
     if (!Object.keys(dto).length) throw new BadRequestException(`empty data`);
 
     return this.usersService.updateMe(dto);

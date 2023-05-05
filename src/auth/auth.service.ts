@@ -11,6 +11,7 @@ import { SignInDto } from './dto/sign-in.dto';
 import * as jwt from 'jsonwebtoken';
 import { SignUpDto } from './dto/sign-up.dto';
 import { UsersService } from '../users/users.service';
+import { User } from './domain/authorized-user.entity';
 
 @Injectable()
 export class AuthService {
@@ -41,5 +42,27 @@ export class AuthService {
       issuer: 'mJis.com',
     });
     return { token };
+  }
+
+  verify(jwtString: string) {
+    try {
+      const payload = jwt.verify(jwtString, this.secret) as (
+        | jwt.JwtPayload
+        | string
+      ) &
+        User;
+
+      const { id, email, role, nickname, exp } = payload;
+
+      return {
+        id,
+        email,
+        role,
+        nickname,
+        expiredAt: exp,
+      };
+    } catch (e) {
+      return false;
+    }
   }
 }
