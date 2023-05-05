@@ -1,4 +1,10 @@
-import { Inject, Injectable } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Inject,
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import commonConfig from '../config/common.config';
 import { ConfigType } from '@nestjs/config';
 import { SignInDto } from './dto/sign-in.dto';
@@ -21,12 +27,19 @@ export class AuthService {
   }
 
   async signIn(dto: SignInDto) {
-    const user = await this.userService.getUserByEmail(dto.email);
+    const user = await this.userService.getUserForSignIn(
+      dto.email,
+      dto.password,
+    );
+    if (!user) throw new UnauthorizedException(`invalid email or password`);
 
-    return jwt.sign(dto, this.secret, {
-      expiresIn: '1d',
-      audience: user.email,
+    const { password, ...userData } = user;
+
+    const token = jwt.sign(userData, this.secret, {
+      expiresIn: '5m',
+      audience: userData.email,
       issuer: 'mJis.com',
     });
+    return { token };
   }
 }

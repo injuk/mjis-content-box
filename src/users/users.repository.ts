@@ -36,10 +36,9 @@ export class UsersRepository {
     });
   }
 
-  getUserByEmail(email: string) {
-    return this.prisma.user.findUnique({
-      where: { email },
-      select: selectUserClause,
+  getUserForSignIn(email: string, password: string) {
+    return this.prisma.user.findFirst({
+      where: { email, password },
     });
   }
 

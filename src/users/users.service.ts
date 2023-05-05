@@ -14,20 +14,9 @@ export class UsersService {
 
   constructor(private readonly repository: UsersRepository) {}
 
-  createUser(dto: CreateUserDto) {
-    return this.repository.createUser(dto);
-  }
-
   async getUserById(id: number) {
     const result = await this.repository.getUserById(id);
     if (!result) throw new NotFoundException(`user_id(${id})`);
-
-    return result;
-  }
-
-  async getUserByEmail(email: string) {
-    const result = await this.repository.getUserByEmail(email);
-    if (!result) throw new NotFoundException(`user_email(${email})`);
 
     return result;
   }
@@ -46,5 +35,13 @@ export class UsersService {
     if (!id) throw new BadRequestException(`id should not be empty`);
 
     return this.repository.deleteMe(id);
+  }
+
+  createUser(dto: CreateUserDto) {
+    return this.repository.createUser(dto);
+  }
+
+  getUserForSignIn(email: string, password: string) {
+    return this.repository.getUserForSignIn(email, password);
   }
 }

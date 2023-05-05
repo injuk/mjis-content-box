@@ -8,6 +8,7 @@ import {
   Delete,
   UsePipes,
   ValidationPipe,
+  HttpCode,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { SignUpDto } from './dto/sign-up.dto';
@@ -25,6 +26,7 @@ export class AuthController {
 
   @Post('/sign-in')
   @UsePipes(new ValidationPipe())
+  @HttpCode(200)
   signIn(@Body() dto: SignInDto) {
     return this.authService.signIn(dto);
   }
