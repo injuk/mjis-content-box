@@ -9,7 +9,7 @@ import commonConfig from './config/common.config';
 @Module({
   imports: [
     ConfigModule.forRoot({
-      envFilePath: [`${__dirname}/config/env/.${process.env.NODE_ENV}.env`],
+      envFilePath: [`${__dirname}/../env/.${process.env.NODE_ENV}.env`],
       load: [commonConfig],
       isGlobal: true,
     }),
