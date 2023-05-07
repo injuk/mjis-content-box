@@ -26,36 +26,31 @@
 
 [Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
 
-## Installation
-
-```bash
-$ npm install
-```
-
 ## Running the app
 
 ```bash
-# development
-$ npm run start
+# 사전 작업
+$ # 1. docker 등을 활용하여 postgresql 데이터베이스와 연결 정보를 준비
+$ # 2. 1.의 연결 정보를 resources/prisma/.env에 작성
+$ #   2-1. DATABASE_URL=postgresql://postgres:[DB_PASSWORD]@[DB_URI]:[DB_PORT]/[DB_NAME]?schema=[SCHEMA_NAME]
+$ #   2-2. SYSTEM_USER_PW=[PW_FOR_ADMIN]
+$ # 3. app 실행과 관련된 정보를 resources/env/.development.env에 작성
+$ #   3-1. APPLICATION_PORT=[APPLICATION_PORT]
+$ #   3-2. JWT_SECRET=[JWT_SECRET]
+$ #   3-3. JWT_EXPIRES_IN=[JWT_EXPIRES_IN]
+$ #     3-3-1. ex) JWT_EXPIRES_IN=5m
 
-# watch mode
+# 의존성 설치
+$ npm install
+
+# db migration
+$ npx prisma db push
+
+# db seeding
+$ npx prisma db seed
+
+# 애플리케이션 실행
 $ npm run start:dev
-
-# production mode
-$ npm run start:prod
-```
-
-## Test
-
-```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
 ```
 
 ## Support
