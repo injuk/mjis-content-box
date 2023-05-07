@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ConflictException,
   Injectable,
   NotFoundException,
@@ -19,7 +20,7 @@ export class BooksRepository {
           id: data.createdBy,
         },
       });
-      if (!user) throw new NotFoundException(`user_id(${data.createdBy})`);
+      if (!user) throw new BadRequestException(`invalid userId`);
 
       const book = await transactionCtx.book.findUnique({
         where: {
@@ -64,7 +65,7 @@ export class BooksRepository {
           id: userId,
         },
       });
-      if (!user) throw new NotFoundException(`user_id(${userId})`);
+      if (!user) throw new BadRequestException(`invalid userId`);
 
       const book = await transactionCtx.book.findUnique({
         where: { id },
@@ -85,7 +86,7 @@ export class BooksRepository {
           id: userId,
         },
       });
-      if (!user) throw new NotFoundException(`user_id(${userId})`);
+      if (!user) throw new BadRequestException(`invalid userId`);
 
       const book = await transactionCtx.book.findUnique({
         where: { id },

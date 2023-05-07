@@ -102,7 +102,7 @@ export class ReviewsRepository {
           id: userId,
         },
       });
-      if (!user) throw new NotFoundException(`user_id(${userId})`);
+      if (!user) throw new BadRequestException(`invalid userId`);
 
       const review = await transactionCtx.review.findUnique({
         where: { id },
@@ -126,7 +126,7 @@ export class ReviewsRepository {
           id: userId,
         },
       });
-      if (!user) throw new NotFoundException(`user_id(${userId})`);
+      if (!user) throw new BadRequestException(`invalid userId`);
 
       const review = await transactionCtx.review.findUnique({
         where: { id },

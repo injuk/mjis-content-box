@@ -55,14 +55,8 @@ export class UsersService {
   }
 
   async createUser(dto: CreateUserDto) {
-    const { password } = dto;
-
-    // const salt = await bcrypt.genSalt();
-    // const hashedPassword = await bcrypt.hash(password, salt);
-
     const passwordEncrypted = await this.encryptPassword(dto);
 
-    // return this.repository.createUser({ ...dto, password: hashedPassword });
     return this.repository.createUser(passwordEncrypted as CreateUserDto);
   }
 
