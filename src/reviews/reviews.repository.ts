@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ConflictException,
   ForbiddenException,
   Injectable,
@@ -14,7 +15,6 @@ import { selectReviewClause } from './domain/select-conditions.domain';
 export class ReviewsRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  // TODO: user 도메인이 추가되면 수정 할 것
   createReview(user, param: CreateReviewDto) {
     const userId: number = user.id;
     const { itemId } = param;
@@ -25,7 +25,17 @@ export class ReviewsRepository {
           id: userId,
         },
       });
-      if (!user) throw new NotFoundException(`user_id(${userId})`);
+      if (!user) throw new BadRequestException(`invalid userId`);
+
+      const item =
+        param.domain === ReviewDomainEnum.BOOK
+          ? await transactionCtx.book.findUnique({
+              where: { id: param.itemId },
+            })
+          : await transactionCtx.movie.findUnique({
+              where: { id: param.itemId },
+            });
+      if (!item) throw new BadRequestException(`invalid (domain, itemId)`);
 
       const review = await transactionCtx.review.findUnique({
         where: {
@@ -35,7 +45,6 @@ export class ReviewsRepository {
       if (review)
         throw new ConflictException(`user(${userId}), item(${itemId})`);
 
-      // TODO: item이 실제로 존재하는지 확인
       const data = { ...param, userId };
       return transactionCtx.review.create({ data });
     });

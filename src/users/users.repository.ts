@@ -52,10 +52,13 @@ export class UsersRepository {
       });
       if (!user) throw new NotFoundException(`user_id(${id})`);
 
-      return transActionCtx.user.update({
+      const result = await transActionCtx.user.update({
         where: { id },
         data: { ...dto },
       });
+      Reflect.deleteProperty(result, 'password');
+
+      return result;
     });
   }
 

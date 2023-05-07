@@ -37,12 +37,14 @@ export class UsersService {
     return result;
   }
 
-  updateMe(user, dto: UpdateUserDto) {
+  async updateMe(user, dto: UpdateUserDto) {
     const id = user.id;
     this.logger.debug(`user(${id}) try to update user information`);
     if (!id) throw new BadRequestException(`id should not be empty`);
 
-    return this.repository.updateMe(id, dto);
+    const passwordEncrypted = await this.encryptPassword(dto);
+
+    return this.repository.updateMe(id, passwordEncrypted as UpdateUserDto);
   }
 
   deleteMe(user) {
@@ -55,10 +57,22 @@ export class UsersService {
   async createUser(dto: CreateUserDto) {
     const { password } = dto;
 
+    // const salt = await bcrypt.genSalt();
+    // const hashedPassword = await bcrypt.hash(password, salt);
+
+    const passwordEncrypted = await this.encryptPassword(dto);
+
+    // return this.repository.createUser({ ...dto, password: hashedPassword });
+    return this.repository.createUser(passwordEncrypted as CreateUserDto);
+  }
+
+  async encryptPassword(dto: CreateUserDto | UpdateUserDto) {
+    const { password } = dto;
+
     const salt = await bcrypt.genSalt();
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    return this.repository.createUser({ ...dto, password: hashedPassword });
+    return { ...dto, password: hashedPassword };
   }
 
   async signIn(dto: SignInDto) {

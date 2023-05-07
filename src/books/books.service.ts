@@ -22,7 +22,6 @@ export class BooksService {
       genre: dto.genre,
       coverUrl: dto.coverUrl,
 
-      // TODO: users API가 도입되면 수정할 것
       createdBy: user.id,
       updatedBy: user.id,
     };
