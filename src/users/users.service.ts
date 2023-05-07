@@ -14,6 +14,7 @@ import * as jwt from 'jsonwebtoken';
 import commonConfig from '../config/common.config';
 import { ConfigType } from '@nestjs/config';
 import { User } from './domain/authorized-user.entity';
+import * as bcrypt from 'bcryptjs';
 
 @Injectable()
 export class UsersService {
@@ -37,7 +38,6 @@ export class UsersService {
   }
 
   updateMe(user, dto: UpdateUserDto) {
-    // TODO: 로그인 기능 구현 후 수정 필요
     const id = user.id;
     this.logger.debug(`user(${id}) try to update user information`);
     if (!id) throw new BadRequestException(`id should not be empty`);
@@ -46,24 +46,28 @@ export class UsersService {
   }
 
   deleteMe(user) {
-    // TODO: 로그인 기능 구현 후 수정 필요
     const id = user.id;
     if (!id) throw new BadRequestException(`id should not be empty`);
 
     return this.repository.deleteMe(id);
   }
 
-  createUser(dto: CreateUserDto) {
-    return this.repository.createUser(dto);
-  }
+  async createUser(dto: CreateUserDto) {
+    const { password } = dto;
 
-  getUserForSignIn(email: string, password: string) {
-    return this.repository.getUserForSignIn(email, password);
+    const salt = await bcrypt.genSalt();
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    return this.repository.createUser({ ...dto, password: hashedPassword });
   }
 
   async signIn(dto: SignInDto) {
-    const user = await this.getUserForSignIn(dto.email, dto.password);
+    const user = await this.repository.getUserByEmail(dto.email);
     if (!user) throw new UnauthorizedException(`invalid email or password`);
+
+    const isValidPassword = await bcrypt.compare(dto.password, user.password);
+    if (!isValidPassword)
+      throw new UnauthorizedException(`invalid email or password`);
 
     const { password, ...userData } = user;
 

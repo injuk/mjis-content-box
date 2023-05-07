@@ -23,9 +23,12 @@ export class UsersRepository {
 
       if (user) throw new ConflictException(`email(${email})`);
 
-      return transActionCtx.user.create({
+      const result = await transActionCtx.user.create({
         data,
       });
+      Reflect.deleteProperty(result, 'password');
+
+      return result;
     });
   }
 
@@ -36,9 +39,9 @@ export class UsersRepository {
     });
   }
 
-  getUserForSignIn(email: string, password: string) {
-    return this.prisma.user.findFirst({
-      where: { email, password },
+  getUserByEmail(email: string) {
+    return this.prisma.user.findUnique({
+      where: { email },
     });
   }
 

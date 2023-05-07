@@ -21,7 +21,7 @@ import commonConfig from 'src/config/common.config';
 import { BooksService } from './books.service';
 import { CreateBookDto } from './dto/create-book.dto';
 import { UpdateBookDto } from './dto/update-book.dto';
-import { UserGuard } from '../users/user.guard';
+import { UserGuard } from '../users/guard/user.guard';
 import { UserRoles } from '../common/enums/user-roles.enum';
 
 @Controller('books')

@@ -3,7 +3,6 @@ import {
   Get,
   Post,
   Body,
-  Headers,
   Patch,
   Param,
   Delete,
@@ -15,7 +14,6 @@ import {
   BadRequestException,
   UseGuards,
   Req,
-  UnauthorizedException,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -23,7 +21,7 @@ import commonConfig from '../config/common.config';
 import { ConfigType } from '@nestjs/config';
 import { SignUpDto } from './dto/sign-up.dto';
 import { SignInDto } from './dto/sign-in.dto';
-import { UserGuard } from './user.guard';
+import { UserGuard } from './guard/user.guard';
 
 @Controller('users')
 export class UsersController {

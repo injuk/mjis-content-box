@@ -27,7 +27,7 @@ import { UpdateReviewDtoPipe } from './pipes/update-review-dto.pipe';
 import { CreateReviewDtoPipe } from './pipes/create-review-dto.pipe';
 import { ListReviewsDtoPipe } from './pipes/list-review-dto.pipe';
 import { GetReviewDtoPipe } from './pipes/get-review-dto.pipe';
-import { UserGuard } from '../users/user.guard';
+import { UserGuard } from '../users/guard/user.guard';
 import { UserRoles } from '../common/enums/user-roles.enum';
 
 @Controller('reviews')
