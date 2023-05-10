@@ -36,10 +36,10 @@ export class BooksService {
   }
 
   // TODO: 반환 형태 정의하기
-  async getBookById(id: number) {
+  async getBookById(id: number, hasReviews: boolean) {
     this.logger.debug(`get book by id`);
 
-    const result = await this.repository.getBookById(id);
+    const result = await this.repository.getBookById(id, hasReviews);
     if (!result) throw new NotFoundException(`book_id(${id})`);
 
     return result;

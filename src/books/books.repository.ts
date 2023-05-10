@@ -6,6 +6,10 @@ import {
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { UpdateBookDto } from './dto/update-book.dto';
+import {
+  selectBookClause,
+  selectBookWithReviewClause,
+} from './domain/select-conditions.domain';
 
 @Injectable()
 export class BooksRepository {
@@ -52,10 +56,15 @@ export class BooksRepository {
     });
   }
 
-  getBookById(id: number) {
+  getBookById(id: number, hasReviews: boolean) {
     return this.prisma.book.findUnique({
       where: { id },
+      select: this.createSelectClause(hasReviews),
     });
+  }
+
+  private createSelectClause(hasReviews: boolean) {
+    return hasReviews ? selectBookWithReviewClause : selectBookClause;
   }
 
   updateBook(userId: number, id: number, dto: UpdateBookDto) {

@@ -11,6 +11,7 @@ import {
   ParseIntPipe,
   Patch,
   Post,
+  Query,
   Req,
   UseGuards,
   UsePipes,
@@ -48,8 +49,17 @@ export class BooksController {
   }
 
   @Get('/:id')
-  getBookById(@Param('id', ParseIntPipe) id: number) {
-    return this.booksService.getBookById(id);
+  getBookById(
+    @Param('id', ParseIntPipe) id: number,
+    @Query('hasReviews') hasReviews: string,
+  ) {
+    return this.booksService.getBookById(id, this.toBoolean(hasReviews));
+  }
+
+  private toBoolean(str: string): boolean {
+    if (!str) return false;
+
+    return str.toUpperCase() === 'TRUE';
   }
 
   @UseGuards(UserGuard)
